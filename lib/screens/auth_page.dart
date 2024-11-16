@@ -11,10 +11,10 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
 
-  bool isLoading = true;
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return isLoading? LoadingScreen() : LoginScreen();
+    return isLoading? const LoadingScreen() : LoginScreen();
   }
 }
 
