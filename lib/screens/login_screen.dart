@@ -1,9 +1,11 @@
 import 'package:attendance_tracking_app/providers/auth_provider.dart';
+import 'package:attendance_tracking_app/screens/auth_page.dart';
 import 'package:attendance_tracking_app/screens/loading_screen.dart';
 import 'package:attendance_tracking_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:attendance_tracking_app/widgets/my_button.dart';
 import 'package:attendance_tracking_app/widgets/my_textfield.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,24 +18,27 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  late final AuthProvider authProvider;
-  late final AuthService authService;
 
   void signUserIn() async {
     final username = emailController.text;
     final password = passwordController.text;
     
-    authProvider = Provider.of<AuthProvider>(context, listen: false);
-    authService = AuthService(authProvider);
-    authService.login(username, password);
+    final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final AuthService authService = AuthService(authProvider);
+    final isAuthenticated = await authService.login(username, password);
+    if(isAuthenticated){
+      authService.isLoggedIn();
+    }else{
+      print("Not Authenticated");
+    }
 
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: LoadingScreen(),
-          );
-        });
+    // showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return const Center(
+    //         child: LoadingScreen(),
+    //       );
+    //     });
   }
 
   void genericErrorMessage(String message) {

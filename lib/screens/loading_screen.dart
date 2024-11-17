@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key});
+class StaggeredLoading extends StatefulWidget {
+  const StaggeredLoading({super.key});
 
   @override
-  State<LoadingScreen> createState() => _LoadingScreenState();
+  State<StaggeredLoading> createState() => _StaggeredLoadingState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen> {
+class _StaggeredLoadingState extends State<StaggeredLoading> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
         body: Center(
-      child: CircularProgressIndicator(
+      child: LoadingAnimationWidget.staggeredDotsWave(
         color: Colors.black,
+        size: 100,
       ),
     ));
   }

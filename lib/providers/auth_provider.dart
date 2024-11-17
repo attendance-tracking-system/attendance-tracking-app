@@ -41,9 +41,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> login(Map<String, dynamic> data) async {
-    setJwt(data);
+    // setJwt(data);
     final encodedData = await jsonEncode(data);
     await _storage.write(key: "jwtTokens", value: encodedData);
+    // _isLoggedin=true;
     notifyListeners();
   }
 

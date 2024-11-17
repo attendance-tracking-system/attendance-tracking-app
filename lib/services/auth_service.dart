@@ -24,7 +24,7 @@ class AuthService {
     authProvider.logout();
   }
 
-  Future<void> login(String username, String password)async {
+  Future<bool> login(String username, String password)async {
     final url = Uri.parse(loginUrl); 
     final response = await http.post(
       url,
@@ -34,9 +34,11 @@ class AuthService {
 
     final data = await json.decode(response.body) as Map<String, dynamic>;
     if(data["statusCode"]==200){
-      authProvider.login(data["body"]);
+      await authProvider.login(data["body"]);
+      return true;
     }else{
       print(data["body"]["message"]);
+      return false;
     }
   }
 }

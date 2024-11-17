@@ -1,0 +1,52 @@
+import 'package:attendance_tracking_app/providers/auth_provider.dart';
+import 'package:attendance_tracking_app/screens/auth_page.dart';
+import 'package:attendance_tracking_app/screens/home.dart';
+import 'package:attendance_tracking_app/screens/loading_screen.dart';
+import 'package:attendance_tracking_app/screens/login_screen.dart';
+import 'package:attendance_tracking_app/services/auth_service.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
+
+// GoRouter configuration
+class Routes {
+  final router = GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(
+        name:
+            'loading', // Optional, add name to your routes. Allows you navigate by name instead of path
+        path: '/',
+        builder: (context, state) => StaggeredLoading(),
+      ),
+      GoRoute(
+        name:
+            'home', // Optional, add name to your routes. Allows you navigate by name instead of path
+        path: '/home',
+        builder: (context, state) => HomeScreen(),
+      ),
+      GoRoute(
+        name: 'login',
+        path: '/login',
+        builder: (context, state) => LoginScreen(),
+      ),
+    ],
+    redirect: (BuildContext context, GoRouterState state) {
+      final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: true);
+      if(authProvider.isLoading){
+        return '/';
+      }else if(authProvider.isLoggedin){
+        return '/home';
+      }else if(!authProvider.isLoggedin){
+        return '/login';
+      }
+      
+      return null;
+
+    },
+
+  );
+}
+
+

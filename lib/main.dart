@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:attendance_tracking_app/routes/routes.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -46,30 +47,48 @@ class _MyAppState extends State<MyApp> {
   });
     
   }
-  Future<void> testFunc()async{
-    FlutterSecureStorage storage = new FlutterSecureStorage();
-    await storage.delete(key: "jwtTokens");
-  }
   
   @override
   Widget build(BuildContext context) {
 
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: Routes().router,
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
           useMaterial3: true,
         ),
-        home: Consumer<AuthProvider>(builder: (context, auth, child){
-          if(auth.isLoading){
-            return staggeredLoading(context);
-          }else if(auth.isLoggedin){
-            return HomeScreen();
-          }
-          else{
-            return LoginScreen();
-          }
-        },) );
+         );
   }
 }
+// home: Consumer<AuthProvider>(builder: (context, auth, child){
+//           if(auth.isLoading){
+//             return staggeredLoading(context);
+//           }else if(auth.isLoggedin){
+//             return HomeScreen();
+//           }
+//           else{
+//             return LoginScreen();
+//           }
+//         },)
+
+// class StaggeredLoading extends StatefulWidget {
+//   const StaggeredLoading({super.key});
+
+//   @override
+//   State<StaggeredLoading> createState() => _StaggeredLoadingState();
+// }
+
+// class _StaggeredLoadingState extends State<StaggeredLoading> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//         body: Center(
+//       child: LoadingAnimationWidget.staggeredDotsWave(
+//         color: Colors.black,
+//         size: 100,
+//       ),
+//     ));
+//   }
+// }

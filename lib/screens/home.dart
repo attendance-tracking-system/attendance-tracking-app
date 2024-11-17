@@ -13,12 +13,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final AuthProvider authProvider;
-  late final AuthService authService;
   
   void logout(){
-    authProvider = Provider.of<AuthProvider>(context, listen: false);
-    authService = AuthService(authProvider);
+    final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final AuthService authService = AuthService(authProvider);
     authService.logout();
   }
   @override
