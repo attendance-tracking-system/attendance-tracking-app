@@ -1,5 +1,6 @@
 import 'package:attendance_tracking_app/providers/auth_provider.dart';
 import 'package:attendance_tracking_app/screens/auth_page.dart';
+import 'package:attendance_tracking_app/screens/face_screen.dart';
 import 'package:attendance_tracking_app/screens/home.dart';
 import 'package:attendance_tracking_app/screens/loading_screen.dart';
 import 'package:attendance_tracking_app/screens/login_screen.dart';
@@ -18,7 +19,7 @@ class Routes {
         name:
             'loading', // Optional, add name to your routes. Allows you navigate by name instead of path
         path: '/',
-        builder: (context, state) => StaggeredLoading(),
+        builder: (context, state) => HomeScreen(),
       ),
       GoRoute(
         name:
@@ -31,22 +32,25 @@ class Routes {
         path: '/login',
         builder: (context, state) => LoginScreen(),
       ),
+      GoRoute(
+          name: 'facecapture',
+          path: '/facecapture',
+          builder: (context, state) => FaceScreen())
     ],
-    redirect: (BuildContext context, GoRouterState state) {
-      final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: true);
-      if(authProvider.isLoading){
-        return '/';
-      }else if(authProvider.isLoggedin){
-        return '/home';
-      }else if(!authProvider.isLoggedin){
-        return '/login';
-      }
-      
-      return null;
+    // redirect: (BuildContext context, GoRouterState state) {
+    //   // final AuthProvider authProvider =
+    //   //     Provider.of<AuthProvider>(context, listen: true);
+    //   // if (authProvider.isLoading) {
+    //   //   return '/';
+    //   // } else if (authProvider.isLoggedin) {
+    //   //   return '/home';
+    //   // } else if (!authProvider.isLoggedin) {
+    //   //   return '/login';
+    //   // }
 
-    },
+    //   return '/home';
 
+    //   return null;
+    // },
   );
 }
-
-

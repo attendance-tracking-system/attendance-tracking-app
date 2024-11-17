@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 243, 243, 243),
+      // backgroundColor: Colors.white,//Color.fromARGB(255, 243, 243, 243),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(

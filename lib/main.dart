@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
       routerConfig: Routes().router,
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
+        theme: ThemeData(scaffoldBackgroundColor: Colors.white,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
           useMaterial3: true,
         ),

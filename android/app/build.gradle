@@ -5,6 +5,10 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// aaptOptions {
+//     noCompress "Regula/faceSdkResource.dat"
+// }
+
 android {
     namespace = "com.example.attendance_tracking_app"
     compileSdk = flutter.compileSdkVersion
