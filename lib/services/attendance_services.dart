@@ -11,7 +11,7 @@ class AttendanceService {
 
   AttendanceService(this.authProvider);
 
-  Future<void> recordAttendance(Uint8List image, Map<String, dynamic> currentLocation)async{
+  Future<Map<String, dynamic> > recordAttendance(Uint8List image, Map<String, dynamic> currentLocation)async{
   // Future<void> recordAttendance()async{
     print("**********************************************************");
     final content = {
@@ -41,7 +41,7 @@ class AttendanceService {
     
     final data = await json.decode(response.body) as Map<String, dynamic>;
     print(data);
-
+    return data;
   }
   
 }

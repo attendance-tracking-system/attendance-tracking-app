@@ -7,12 +7,13 @@ class AuthProvider extends ChangeNotifier {
   Map<String, dynamic>? _jwtToken;
   bool _isLoading = false;
   bool _isLoggedin = false;
+  Map<String, dynamic>? _user;
 
   FlutterSecureStorage _storage = new FlutterSecureStorage();
 
   bool get isLoading => _isLoading;
   bool get isLoggedin => _isLoggedin;
-
+  Map<String, dynamic>? get user => _user;
   Map<String, dynamic>? get jwtToken => _jwtToken;
 
   void loading() {
@@ -26,14 +27,19 @@ class AuthProvider extends ChangeNotifier {
       "access_token": data["access_token"],
       "refresh_token": data["refresh_token"]
     };
-  }
+    notifyListeners();
+  } 
 
+  Future<void> getUserDetails( data) async{
+    _user = data;
+    notifyListeners();
+  }
   Future<void> loggedIn() async {
+
     final jwt = await _storage.read(key: "jwtTokens");
     if (jwt != null) {
       final data = await jsonDecode(jwt);
       setJwt(data);
-      print(data);
       _isLoggedin = true;
     }
     _isLoading = false;

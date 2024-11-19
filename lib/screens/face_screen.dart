@@ -5,10 +5,12 @@ import 'package:attendance_tracking_app/services/attendance_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_face_api/flutter_face_api.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class FaceScreen extends StatefulWidget {
   const FaceScreen({super.key});
@@ -25,6 +27,9 @@ class _FaceScreenState extends State<FaceScreen> {
   var image;
   bool _isFaceCaptureLoading = true;
   bool _isLocationCaptureLoading = true;
+  bool _isProgressVisible = false;
+  bool _isRes = false;
+  late Map<String, dynamic> _res;
 
   @override
   void initState() {
@@ -69,11 +74,23 @@ class _FaceScreenState extends State<FaceScreen> {
       });
     }
     if (_isFaceCaptureLoading == false && _isLocationCaptureLoading == false) {
+      await Future.delayed(const Duration(seconds: 5));
+      setState(() {
+        _isProgressVisible = true;
+      });
       final AuthProvider authProvider =
           Provider.of<AuthProvider>(context, listen: false);
       final AttendanceService attendanceService =
           AttendanceService(authProvider);
-      await attendanceService.recordAttendance(image, current_location);
+      final res =
+          await attendanceService.recordAttendance(image, current_location);
+      print(res);
+      setState(() {
+        _isRes = true;
+        _res = res;
+      });
+      await Future.delayed(const Duration(seconds: 5));
+      context.go('/dashboard');
     }
     return;
   }
@@ -86,48 +103,6 @@ class _FaceScreenState extends State<FaceScreen> {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     return serviceEnabled;
   }
-
-  // Future<Position> _determinePosition() async {
-  //   // Check if location services are enabled
-  //   bool serviceEnabled = await isLoactionServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     // Location services are not enabled return an error message
-  //     await Geolocator.openLocationSettings();
-  //     await Future.delayed(Duration(seconds: 5));
-  //     serviceEnabled = await isLoactionServiceEnabled();
-  //     if (!serviceEnabled) {
-  //       return Future.error('Location services are disabled.');
-  //     }
-  //   }
-
-  //   // Check location permissions
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       return Future.error('Location permissions are denied');
-  //     }
-  //   }
-
-  //   if (permission == LocationPermission.deniedForever) {
-  //     await Geolocator.openAppSettings();
-  //     await Future.delayed(Duration(seconds: 5));
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.deniedForever ||
-  //         permission == LocationPermission.denied) {
-  //       return Future.error(
-  //           'Location permissions are permanently denied, we cannot request permissions.');
-  //     }
-  //   }
-  //   final LocationSettings locationSettings = LocationSettings(
-  //     accuracy: LocationAccuracy.high,
-  //     distanceFilter: 100,
-  //   );
-
-  //   // If permissions are granted, return the current location
-  //   return await Geolocator.getCurrentPosition(
-  //       locationSettings: locationSettings);
-  // }
 
   Future<Position?> _determinePosition() async {
     try {
@@ -235,9 +210,7 @@ class _FaceScreenState extends State<FaceScreen> {
 
     // Convert the cropped image back to Uint8List
     final croppedBytes = Uint8List.fromList(img.encodeJpg(croppedImage));
-    // print("****************************************************");
-    // print(croppedImage.lengthInBytes/1024);
-    // print("****************************************************");
+
     setState(() {
       image = croppedBytes;
     });
@@ -296,102 +269,402 @@ class _FaceScreenState extends State<FaceScreen> {
     return retry;
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //       body: SingleChildScrollView(
+  //     child:
+  //     Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Padding(
+  //           padding: const EdgeInsets.only(top: 25, bottom: 25),
+  //           child: Text(
+  //             "Verification",
+  //             style: TextStyle(
+  //                 color: Colors.black,
+  //                 fontSize: 35,
+  //                 fontWeight: FontWeight.bold),
+  //           ),
+  //         ),
+  //         Padding(
+  //           padding: EdgeInsets.symmetric(vertical: 15),
+  //           child: Image.asset(
+  //             'assets/face_scan.gif',
+  //             height: 200,
+  //             width: 200,
+  //           ),
+  //         ),
+  //         SizedBox(
+  //           height: 10,
+  //         ),
+  //         Container(
+  //           padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
+  //           child: Row(
+  //             children: [
+  //               Container(
+  //                 height: 25,
+  //                 width: 25,
+  //                 child: (_isFaceCaptureLoading)
+  //                     ? CircularProgressIndicator(
+  //                         color: Colors.black,
+  //                       )
+  //                     : Icon(Icons.check_circle_outlined),
+  //               ),
+  //               SizedBox(
+  //                 width: 20,
+  //               ),
+  //               Center(
+  //                 child: Text(
+  //                   "Face Verification",
+  //                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //         Container(
+  //           padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
+  //           child: Row(
+  //             children: [
+  //               Container(
+  //                 height: 25,
+  //                 width: 25,
+  //                 child: (_isLocationCaptureLoading)
+  //                     ? CircularProgressIndicator(
+  //                         color: Colors.black,
+  //                       )
+  //                     : Icon(Icons.check_circle_outlined),
+  //               ),
+  //               SizedBox(
+  //                 width: 20,
+  //               ),
+  //               Center(
+  //                 child: Text(
+  //                   "Geoloaction Verification",
+  //                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   ));
+  // }
+
+  Widget _dialog() {
+    try {
+      if (!_isRes) {
+        return loadDialog("Verification in progress. Please wait.",
+            CircularProgressIndicator(color: Colors.black));
+      } else if (_res["statusCode"] == 403) {
+        return loadDialog(
+            "An unknown error occurred.",
+            Icon(
+              Icons.close_rounded,
+              size: 25,
+            ));
+      } else if (_res["body"]["isLocationVerified"] == "False") {
+        return loadDialog(
+            "Location verification failed.",
+            Icon(
+              Icons.close_rounded,
+              size: 25,
+            ));
+      } else if (_res["body"]["isBiometricVerified"] == "False") {
+        return loadDialog(
+            "Biometric verification failed.",
+            Icon(
+              Icons.close_rounded,
+              size: 25,
+            ));
+      } else {
+        return loadDialog(
+            "Punch successfull.",
+            Icon(
+              Icons.timer,
+              size: 25,
+            ));
+      }
+    } catch (e) {
+      return loadDialog(
+          "An unknown error occurred.",
+          Icon(
+            Icons.close_rounded,
+            size: 25,
+          ));
+    }
+  }
+
+  Widget loadDialog(String text, Widget widget) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 300,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              widget,
+              SizedBox(height: 50),
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 25, bottom: 25),
-            child: Text(
-              "Verification",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 15),
-            child: Image.asset(
-              'assets/face_scan.gif',
-              height: 200,
-              width: 200,
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Container(
-            padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
-            child: Row(
+          // Main content of the screen
+          Visibility(
+            visible: !_isProgressVisible,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  height: 25,
-                  width: 25,
-                  child: (_isFaceCaptureLoading)
-                      ? CircularProgressIndicator(
-                          color: Colors.black,
-                        )
-                      : Icon(Icons.check_circle_outlined),
+                Padding(
+                  padding: const EdgeInsets.only(top: 25, bottom: 25),
+                  child: Text(
+                    "Verification",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  child: Image.asset(
+                    'assets/face_scan.gif',
+                    height: 200,
+                    width: 200,
+                  ),
                 ),
                 SizedBox(
-                  width: 20,
+                  height: 10,
                 ),
-                Center(
-                  child: Text(
-                    "Face Verification",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                Container(
+                  padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 25,
+                        width: 25,
+                        child: (_isFaceCaptureLoading)
+                            ? CircularProgressIndicator(
+                                color: Colors.black,
+                              )
+                            : Icon(Icons.check_circle_outlined),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Center(
+                        child: Text(
+                          "Face Verification",
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
                   ),
-                )
+                ),
+                Container(
+                  padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 25,
+                        width: 25,
+                        child: (_isLocationCaptureLoading)
+                            ? CircularProgressIndicator(
+                                color: Colors.black,
+                              )
+                            : Icon(Icons.check_circle_outlined),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Center(
+                        child: Text(
+                          "Geoloaction Verification",
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
-            child: Row(
-              children: [
-                Container(
-                  height: 25,
-                  width: 25,
-                  child: (_isLocationCaptureLoading)
-                      ? CircularProgressIndicator(
-                          color: Colors.black,
-                        )
-                      : Icon(Icons.check_circle_outlined),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Center(
-                  child: Text(
-                    "Geoloaction Verification",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                )
-              ],
-            ),
-          ),
-          // Center(
-          //   child: TextButton(
-          //       onPressed: handleCapture,
-          //       child: (image != null) ? Image.memory(image) : Text("Capture")),
-          // ),
-          // (image != null)
-          //     ? ClipRRect(
-          //         borderRadius: BorderRadius.circular(120),
-          //         child: Image.memory(
-          //           image,
-          //           fit: BoxFit.fill,
-          //           width: 120,
-          //           height: 120,
-          //         ),
-          //       )
-          //     : Text("No Image")
+          Visibility(
+            visible: _isProgressVisible,
+            child: _dialog(),
+          ) // Overlay dialog
         ],
       ),
-    ));
+    );
   }
 }
+
+// class FaceScreen extends StatelessWidget {
+//   const FaceScreen({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: SingleChildScrollView(
+//         child: Stack(
+//           children: [
+//             // Main content of the screen
+//             Positioned.fill(
+//               child: Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Padding(
+//             padding: const EdgeInsets.only(top: 25, bottom: 25),
+//             child: Text(
+//               "Verification",
+//               style: TextStyle(
+//                   color: Colors.black,
+//                   fontSize: 35,
+//                   fontWeight: FontWeight.bold),
+//             ),
+//           ),
+//           Padding(
+//             padding: EdgeInsets.symmetric(vertical: 15),
+//             child: Image.asset(
+//               'assets/face_scan.gif',
+//               height: 200,
+//               width: 200,
+//             ),
+//           ),
+//           SizedBox(
+//             height: 10,
+//           ),
+//           Container(
+//             padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
+//             child: Row(
+//               children: [
+//                 Container(
+//                   height: 25,
+//                   width: 25,
+//                   child: (_isFaceCaptureLoading)
+//                       ? CircularProgressIndicator(
+//                           color: Colors.black,
+//                         )
+//                       : Icon(Icons.check_circle_outlined),
+//                 ),
+//                 SizedBox(
+//                   width: 20,
+//                 ),
+//                 Center(
+//                   child: Text(
+//                     "Face Verification",
+//                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+//                   ),
+//                 )
+//               ],
+//             ),
+//           ),
+//           Container(
+//             padding: EdgeInsets.fromLTRB(50, 0, 0, 25),
+//             child: Row(
+//               children: [
+//                 Container(
+//                   height: 25,
+//                   width: 25,
+//                   child: (_isLocationCaptureLoading)
+//                       ? CircularProgressIndicator(
+//                           color: Colors.black,
+//                         )
+//                       : Icon(Icons.check_circle_outlined),
+//                 ),
+//                 SizedBox(
+//                   width: 20,
+//                 ),
+//                 Center(
+//                   child: Text(
+//                     "Geoloaction Verification",
+//                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+//                   ),
+//                 )
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+
+//             ),
+//             // Overlay dialog
+//             Center(
+//               child: Material(
+//                 color: Colors.transparent,
+//                 child: Container(
+//                   width: 300,
+//                   padding: EdgeInsets.all(16),
+//                   decoration: BoxDecoration(
+//                     color: Colors.white,
+//                     borderRadius: BorderRadius.circular(16),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.black26,
+//                         blurRadius: 10,
+//                         spreadRadius: 2,
+//                       ),
+//                     ],
+//                   ),
+//                   child: Column(
+//                     mainAxisSize: MainAxisSize.min,
+//                     children: [
+//                       Text(
+//                         "Custom Overlay Dialog",
+//                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                       ),
+//                       SizedBox(height: 10),
+//                       Text(
+//                         "This is a custom overlay that won't close on outside touch.",
+//                         textAlign: TextAlign.center,
+//                       ),
+//                       SizedBox(height: 20),
+//                       ElevatedButton(
+//                         onPressed: () {
+//                           Navigator.of(context).pop(); // Close overlay
+//                         },
+//                         child: Text("Close"),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+
+// }

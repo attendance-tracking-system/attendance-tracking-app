@@ -1,9 +1,11 @@
 import 'package:attendance_tracking_app/providers/auth_provider.dart';
 import 'package:attendance_tracking_app/screens/auth_page.dart';
+import 'package:attendance_tracking_app/screens/dashboard_screen.dart';
 import 'package:attendance_tracking_app/screens/face_screen.dart';
 import 'package:attendance_tracking_app/screens/home.dart';
 import 'package:attendance_tracking_app/screens/loading_screen.dart';
 import 'package:attendance_tracking_app/screens/login_screen.dart';
+import 'package:attendance_tracking_app/screens/register_screen.dart';
 import 'package:attendance_tracking_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -17,20 +19,25 @@ class Routes {
     routes: [
       GoRoute(
         name:
-            'loading', // Optional, add name to your routes. Allows you navigate by name instead of path
+            'home', // Optional, add name to your routes. Allows you navigate by name instead of path
         path: '/',
         builder: (context, state) => HomeScreen(),
       ),
       GoRoute(
         name:
-            'home', // Optional, add name to your routes. Allows you navigate by name instead of path
-        path: '/home',
-        builder: (context, state) => HomeScreen(),
+            'dashboard', // Optional, add name to your routes. Allows you navigate by name instead of path
+        path: '/dashboard',
+        builder: (context, state) => DashboardScreen(),
       ),
+      // GoRoute(
+      //   name: 'login',
+      //   path: '/login',
+      //   builder: (context, state) => LoginScreen(),
+      // ),
       GoRoute(
-        name: 'login',
-        path: '/login',
-        builder: (context, state) => LoginScreen(),
+        name: 'register',
+        path: '/register',
+        builder: (context, state) => RegisterScreen(),
       ),
       GoRoute(
           name: 'facecapture',

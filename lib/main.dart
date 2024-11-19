@@ -38,13 +38,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState(){
     super.initState();
-    final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final AuthService authService = new AuthService(authProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-    authService.isLoggedIn();
-    // testFunc();
+  //   final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
+  //   final AuthService authService = new AuthService(authProvider);
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //   authService.isLoggedIn();
+  //   // testFunc();
     
-  });
+  // });
     
   }
   
