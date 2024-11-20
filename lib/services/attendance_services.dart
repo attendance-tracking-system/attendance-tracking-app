@@ -31,11 +31,11 @@ class AttendanceService {
      final url = Uri.parse(punchUrl); 
      Map<String, dynamic>? jwt = authProvider.jwtToken;
      String base64img = base64Encode(image);
-
+    print(jwt);
      final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({"jwt_tokens":content["jwt_tokens"], "img-1":base64img, "current_location":currentLocation}),
+      body: json.encode({"jwt_tokens":jwt, "img-1":base64img, "current_location":currentLocation}),
       // body: json.encode(content)
     );
     

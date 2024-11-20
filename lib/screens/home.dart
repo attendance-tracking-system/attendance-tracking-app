@@ -34,12 +34,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchUserDetails() async {
     AuthService authService = AuthService(authProvider);
     await authService.isLoggedIn();
-    await authService.getUserDetails();
+    if(authProvider.isLoggedin){
+      await authService.getUserDetails();
+    }else{
+      context.go('/login');
+      return;
+    }
+    
 
     setState(() {
       _isLoading = false;
       _userDetails = authProvider.user!;
     });
+
 
     if (_userDetails["isBiometricRegistered"]) {
       context.go('/dashboard');

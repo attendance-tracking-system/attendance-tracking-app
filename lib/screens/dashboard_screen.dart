@@ -63,11 +63,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return DateFormat('h:mm a').format(_currentDateTime); // e.g., "5:30 PM"
   }
 
-  void logout() {
+  void logout() async{
     final AuthProvider authProvider =
         Provider.of<AuthProvider>(context, listen: false);
     final AuthService authService = AuthService(authProvider);
-    authService.logout();
+    await authService.logout();
+    context.go('/');
   }
 
   @override

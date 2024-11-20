@@ -21,7 +21,7 @@ class RegistrationServices {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'image': base64img, 'jwt_tokens': authProvider.jwtToken}),
     );
-
+  
     final data = await json.decode(response.body) as Map<String, dynamic>;
     print(data);
     return true;

@@ -29,11 +29,11 @@ class Routes {
         path: '/dashboard',
         builder: (context, state) => DashboardScreen(),
       ),
-      // GoRoute(
-      //   name: 'login',
-      //   path: '/login',
-      //   builder: (context, state) => LoginScreen(),
-      // ),
+      GoRoute(
+        name: 'login',
+        path: '/login',
+        builder: (context, state) => LoginScreen(),
+      ),
       GoRoute(
         name: 'register',
         path: '/register',

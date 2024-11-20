@@ -145,11 +145,13 @@ class _FaceScreenState extends State<FaceScreen> {
             permission = await Geolocator.requestPermission();
           },
         );
+        await Geolocator.requestPermission();
         // Recheck permissions
         if (permission == LocationPermission.denied) {
           throw Exception("Location permissions are denied.");
         }
       }
+      
 
       if (permission == LocationPermission.deniedForever) {
         await _showDialog(

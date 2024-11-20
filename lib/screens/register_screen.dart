@@ -18,58 +18,72 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  var faceSdk = FaceSDK.instance;
+  late Uint8List image;
+  late AuthProvider authProvider;
+  bool _isProgressVisible = false;
+  bool _isAuthenticated = false;
+  bool _isloading = true;
 
-var faceSdk = FaceSDK.instance;
-late Uint8List image;
-late AuthProvider authProvider;
-
-@override
-void initState(){
-  super.initState();
-  WidgetsBinding.instance.addPostFrameCallback((_) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       authProvider = Provider.of<AuthProvider>(context, listen: false);
-      
     });
-}
-
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 25, bottom: 25),
-              child: Center(
-                child: Text(
-                  "Biometric Registration",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold),
+      body: Stack(
+        children: [
+          Visibility(
+            visible: !_isProgressVisible,
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 25, bottom: 25),
+                  child: Center(
+                    child: Text(
+                      "Biometric Registration",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  child: Image.asset(
+                    'assets/face_scan.gif',
+                    height: 200,
+                    width: 200,
+                  ),
+                ),
+                Text(
+                  "Please register your face to continue using the app",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                MyButton(
+                    onTap: () {
+                      handleContinue();
+                    },
+                    text: "Continue")
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 15),
-              child: Image.asset(
-                'assets/face_scan.gif',
-                height: 200,
-                width: 200,
-              ),
-            ),
-            Text("Please register your face to continue using the app", style:TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-            SizedBox(height: 30,),
-            MyButton(onTap: (){
-              handleContinue();
-            }, text: "Continue")
-          ],
-        ),
+          ),
+          Visibility(visible: _isProgressVisible, child: Center(child: handleDialog()))
+        ],
       ),
     );
   }
+
   Future<void> initialize() async {
     await faceSdk.initialize();
   }
@@ -99,7 +113,6 @@ void initState(){
       image = croppedBytes;
     });
   }
-
 
   Future<bool> handleCapture() async {
     final config = FaceCaptureConfig(copyright: false);
@@ -154,7 +167,6 @@ void initState(){
   }
 
   Future<void> handleContinue() async {
-
     await initialize();
     bool faceCaptured = false;
     while (!faceCaptured) {
@@ -164,7 +176,7 @@ void initState(){
         bool retry = await _showDialog(
             title: "Registration",
             content:
-                "We failed to capture your face for registratin. Please try again.",
+                "We failed to capture your face for registration. Please try again.",
             buttonName: "Recapture",
             () {});
 
@@ -172,18 +184,83 @@ void initState(){
           print("User Cancelled");
           // Navigator.pop(context);
           return;
-        } 
+        }
       }
     }
 
     // if(image.isNotEmpty){
-      // Call register service
-      RegistrationServices register = RegistrationServices(authProvider);
-      await register.registerBiometric(image);
-      
-      print("DEBUG##PRINT: Registered Biometric");
-      context.go('/');
+    // Call register service
+    setState(() {
+      _isProgressVisible = true;
+    });
+    RegistrationServices register = RegistrationServices(authProvider);
+    final res = await register.registerBiometric(image);
+    if (res) {
+      setState(() {
+        _isloading = false;
+        _isAuthenticated = true;
+      });
+    }
+    print("DEBUG##PRINT: Registered Biometric");
+    await Future.delayed(Duration(seconds: 3));
+    context.go('/');
     // }
   }
-}
 
+  Widget handleDialog() {
+    if (_isloading) {
+      return loadDialog("Registration in progress. Please wait.",
+          CircularProgressIndicator(color: Colors.black));
+    } else if (_isAuthenticated) {
+      return loadDialog(
+          "Successfully registered.",
+          Icon(
+            Icons.check,
+            size: 25,
+          ));
+    } else {
+      return loadDialog(
+          "Registration",
+          Icon(
+            Icons.close,
+            size: 25,
+          ));
+    }
+  }
+
+  Widget loadDialog(String text, Widget widget) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 300,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              widget,
+              SizedBox(height: 50),
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
