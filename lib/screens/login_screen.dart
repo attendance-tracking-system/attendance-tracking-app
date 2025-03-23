@@ -25,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> signUserIn() async {
     setState(() {
       _isProgressVisible = true;
+      _isloading = true;
     });
     final username = emailController.text;
     final password = passwordController.text;
@@ -45,6 +46,11 @@ class _LoginScreenState extends State<LoginScreen> {
       context.go('/');
     } else {
       print("Not Authenticated");
+      await Future.delayed(Duration(seconds: 3));
+      setState(() {
+        _isProgressVisible = false;
+      });
+      context.go('/login');
     }
   }
 
@@ -132,7 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            Visibility(visible: !_isProgressVisible,
+            Visibility(
+              visible: !_isProgressVisible,
               child: SingleChildScrollView(
                 child: Center(
                   child: Column(
@@ -146,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 10),
                       //welcome back you been missed
-                  
+
                       Text(
                         'Welcome back you\'ve been missed',
                         style: TextStyle(
@@ -155,14 +162,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 25),
-                  
+
                       //username
                       MyTextField(
                         controller: emailController,
                         hintText: 'Username or email',
                         obscureText: false,
                       ),
-                  
+
                       const SizedBox(height: 15),
                       //password
                       MyTextField(
@@ -171,18 +178,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: true,
                       ),
                       const SizedBox(height: 15),
-                  
+
                       //sign in button
                       MyButton(
                         onTap: signUserIn,
                         text: 'Sign In',
                       ),
                     ],
-                  ), 
+                  ),
                 ),
               ),
             ),
-          Visibility(visible:_isProgressVisible, child: handleDialog())
+            Visibility(visible: _isProgressVisible, child: handleDialog())
           ],
         ),
       ),

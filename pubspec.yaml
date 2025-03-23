@@ -43,7 +43,7 @@ dependencies:
   flutter_face_core_basic: ^6.3.152
   image: ^4.3.0
   image_picker: ^1.1.2
-  geolocator: ^13.0.2
+  geolocator: ^13.0.3
 
 
   # The following adds the Cupertino Icons font to your application.

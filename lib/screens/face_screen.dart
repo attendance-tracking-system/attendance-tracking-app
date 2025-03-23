@@ -145,13 +145,19 @@ class _FaceScreenState extends State<FaceScreen> {
             permission = await Geolocator.requestPermission();
           },
         );
-        await Geolocator.requestPermission();
+
+        int attempts = 0;
+        while (!serviceEnabled && attempts < 5) {
+          print("checking location serivces");
+          attempts++;
+          await Future.delayed(const Duration(seconds: 3));
+          permission = await Geolocator.checkPermission();
+        }
         // Recheck permissions
         if (permission == LocationPermission.denied) {
-          throw Exception("Location permissions are denied.");
+          context.go('/');
         }
       }
-      
 
       if (permission == LocationPermission.deniedForever) {
         await _showDialog(
